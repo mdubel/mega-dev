@@ -2,7 +2,7 @@
 layout: runbook
 title: '#4471 · the problems it holds'
 owner: Marcin Dubel
-status: open
+status: closed
 reviewed: 2026-10-29
 signature: v1.eyJzdWIiOiI5NTAiLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhdCI6MTc5MzMwMjEzNSwiZXhwIjoxNzkzMzg4NTM1fQ.qmik5651zq8bFlVT-5Jm5MDfnw4Ct_kFMNuHi5zDLKA
 ---
@@ -22,9 +22,10 @@ The reports were merged on their subject line ([decision 0001](/kb/decisions/000
 and a subject says *that* a date is wrong, not *how*. This page splits #4471 by what each report
 shows, and files one ticket per problem.
 
-<Callout kind="warn">
-The queued parser fix closes the <code>parser</code> ticket only. Reports for <code>hint</code> and
-<code>one-day</code> keep coming after it ships.
+<Callout>
+Engineering closed #4471 on 5 October. <code>parser</code>: fixed (<code>fix(dates): parse dd/mm for
+eu locales</code>). <code>hint</code>: won't fix, the <code>booking-v3</code> form is retired.
+<code>one-day</code> got no fix of its own: the desk files its reports under <code>parser</code>.
 </Callout>
 
 ## The problems
@@ -35,23 +36,24 @@ The queued parser fix closes the <code>parser</code> ticket only. Reports for <c
 
 It covers <ProblemCount ticket={4471} problem="parser" /> reports. The shared parser reads every date month
 first, and every tenant on file writes the day first. A booking for 7 April (07/04) goes out as
-4 July. It reaches every tenant, through the app, by email and through the form. This is the bug
-the queued fix is for. Ticket: [#1](https://github.com/mdubel/mega-dev/issues/1).
+4 July. It reaches every tenant, through the app, by email and through the form. Fixed on 5 October
+by `fix(dates): parse dd/mm for eu locales`. Ticket, closed: [#1](https://github.com/mdubel/mega-dev/issues/1).
 
 ### `hint`: booking-v3 tells day-first tenants to type the month first
 
 It covers <ProblemCount ticket={4471} problem="hint" /> reports. `booking-v3` prints `MM/DD/YYYY` under its
 date field. Its tenants' people type what it says, month first, and the form reads the date the
 tenant's way, day first. The date swaps in the form, before the parser sees it. The symptom is the
-same as `parser`, so a subject can't tell them apart; the fix is different. Ticket: [#2](https://github.com/mdubel/mega-dev/issues/2).
+same as `parser`, so a subject can't tell them apart; the fix is different. Won't fix: the `booking-v3` form is retired, so no new reports come this way.
+Ticket, closed: [#2](https://github.com/mdubel/mega-dev/issues/2).
 
 ### `one-day`: the date moves by one day
 
 It covers <ProblemCount ticket={4471} problem="one-day" /> reports. Day and month stay in place; the date
 moves by a day. One meeting showed on Tuesday in Lisbon and on Monday in Toronto, so the date
 crosses a time zone somewhere. The desk read these in the queue and noted them. They stay counted
-under `parser`, where they are filed, and this ticket counts them too. The parser fix won't change
-them. Ticket: [#3](https://github.com/mdubel/mega-dev/issues/3).
+under `parser`, where they are filed, and this ticket counts them too. Engineering's update for
+#4471 has no fix for them. If a one-day move is reported after 5 October, reopen it. Ticket, closed: [#3](https://github.com/mdubel/mega-dev/issues/3).
 
 ## How this was counted
 
