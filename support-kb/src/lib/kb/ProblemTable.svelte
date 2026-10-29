@@ -6,6 +6,10 @@
 
   const split = $derived(splitOf(ticket));
   const repeated = $derived(split.rows - split.reports.length);
+  // Reports counted under one-day as well as where they are filed: filed problem → count.
+  const twice = $derived(
+    split.readAs.reduce<Record<string, number>>((n, r) => ({ ...n, [r.filed]: (n[r.filed] ?? 0) + 1 }), {}),
+  );
   const tally = (n: Record<string, number>) =>
     Object.entries(n)
       .sort((a, b) => b[1] - a[1])
@@ -42,6 +46,10 @@
     {/each}
   </tbody>
 </table>
+
+{#each Object.entries(twice) as [filed, n] (filed)}
+  <p class="note">{n} reports count twice: filed under <code>{filed}</code> by tenant, and under <code>one-day</code> by what they say.</p>
+{/each}
 
 <style>
   .sum { font-size: 1.1rem; }

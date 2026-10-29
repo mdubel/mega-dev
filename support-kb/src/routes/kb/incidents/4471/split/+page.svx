@@ -49,8 +49,9 @@ same as `parser`, so a subject can't tell them apart; the fix is different. Tick
 
 It covers <ProblemCount ticket={4471} problem="one-day" /> reports. Day and month stay in place; the date
 moves by a day. One meeting showed on Tuesday in Lisbon and on Monday in Toronto, so the date
-crosses a time zone somewhere. The desk read these in the queue and noted them; #4471 still counts
-them under `parser`, in a footnote. The parser fix won't change them. Ticket: [#3](https://github.com/mdubel/mega-dev/issues/3).
+crosses a time zone somewhere. The desk read these in the queue and noted them. They stay counted
+under `parser`, where they are filed, and this ticket counts them too. The parser fix won't change
+them. Ticket: [#3](https://github.com/mdubel/mega-dev/issues/3).
 
 ## How this was counted
 
@@ -58,8 +59,9 @@ them under `parser`, in a footnote. The parser fix won't change them. Ticket: [#
 - **Cause from the tenant, not from intake.** `causeOf` in `causes.ts` places a report by its
   tenant's locale and booking form. Intake's tag follows the reporter's browser: it tags every
   `en-US` browser as `hint`, wherever the tenant is.
-- **What a report says beats where it was filed.** A report whose text shows a one-day move
-  (`desk-notes.json`) is its own problem, not a footnote under `parser`.
+- **Counted where it is filed, ticketed by what it says.** A report whose text shows a one-day
+  move (`desk-notes.json`) stays counted under its tenant's cause, as the desk counts, and is
+  counted again under `one-day`, its own ticket, instead of a footnote.
 - **A report with no date in it** stays with its tenant's cause.
 
 Every number on this page is computed from the export when the page is built. When the desk adds
