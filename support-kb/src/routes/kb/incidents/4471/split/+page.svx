@@ -1,0 +1,76 @@
+---
+layout: runbook
+title: '#4471 · the problems it holds'
+owner: Marcin Dubel
+status: open
+reviewed: 2026-10-29
+signature: v1.eyJzdWIiOiI5NTAiLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhdCI6MTc5MzMwMjEzNSwiZXhwIjoxNzkzMzg4NTM1fQ.qmik5651zq8bFlVT-5Jm5MDfnw4Ct_kFMNuHi5zDLKA
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import ProblemCount from '#lib/kb/ProblemCount.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const ISSUES = 'https://github.com/mdubel/mega-dev/issues';
+  const tickets = { parser: `${ISSUES}/1`, hint: `${ISSUES}/2`, 'one-day': `${ISSUES}/3` };
+</script>
+
+[#4471](/kb/incidents/4471) says one issue, one fix queued. Its own table shows more than that.
+The reports were merged on their subject line ([decision 0001](/kb/decisions/0001-dedupe-by-subject)),
+and a subject says *that* a date is wrong, not *how*. This page splits #4471 by what each report
+shows, and files one ticket per problem.
+
+<Callout kind="warn">
+The queued parser fix closes the <code>parser</code> ticket only. Reports for <code>hint</code> and
+<code>one-day</code> keep coming after it ships.
+</Callout>
+
+## The problems
+
+<ProblemTable ticket={4471} {tickets} />
+
+### `parser`: day-first dates are read month first
+
+It covers <ProblemCount ticket={4471} problem="parser" /> reports. The shared parser reads every date month
+first, and every tenant on file writes the day first. A booking for 7 April (07/04) goes out as
+4 July. It reaches every tenant, through the app, by email and through the form. This is the bug
+the queued fix is for. Ticket: [#1](https://github.com/mdubel/mega-dev/issues/1).
+
+### `hint`: booking-v3 tells day-first tenants to type the month first
+
+It covers <ProblemCount ticket={4471} problem="hint" /> reports. `booking-v3` prints `MM/DD/YYYY` under its
+date field. Its tenants' people type what it says, month first, and the form reads the date the
+tenant's way, day first. The date swaps in the form, before the parser sees it. The symptom is the
+same as `parser`, so a subject can't tell them apart; the fix is different. Ticket: [#2](https://github.com/mdubel/mega-dev/issues/2).
+
+### `one-day`: the date moves by one day
+
+It covers <ProblemCount ticket={4471} problem="one-day" /> reports. Day and month stay in place; the date
+moves by a day. One meeting showed on Tuesday in Lisbon and on Monday in Toronto, so the date
+crosses a time zone somewhere. The desk read these in the queue and noted them; #4471 still counts
+them under `parser`, in a footnote. The parser fix won't change them. Ticket: [#3](https://github.com/mdubel/mega-dev/issues/3).
+
+## How this was counted
+
+- **One report per id.** The ticket system exports pages that overlap, so some reports come twice.
+- **Cause from the tenant, not from intake.** `causeOf` in `causes.ts` places a report by its
+  tenant's locale and booking form. Intake's tag follows the reporter's browser: it tags every
+  `en-US` browser as `hint`, wherever the tenant is.
+- **What a report says beats where it was filed.** A report whose text shows a one-day move
+  (`desk-notes.json`) is its own problem, not a footnote under `parser`.
+- **A report with no date in it** stays with its tenant's cause.
+
+Every number on this page is computed from the export when the page is built. When the desk adds
+reports or notes, the table follows.
+
+## For the desk
+
+- Merging on subject alone put every one of these problems in one ticket. The same subject lines
+  turn up under each of them. Decision 0001 is accepted, so it isn't edited here: it needs a new
+  record that replaces it.
+- When a report doesn't match its ticket's symptom, split it out; a footnote keeps it on the
+  wrong fix.
+
+<RenderStamp {signature} />
